@@ -17,7 +17,9 @@
 <p><em>针对 OpenClaw AI 网关的零依赖安全配置基线检查工具<br>Zero-dependency security baseline checker for OpenClaw AI Gateway</em></p>
 
 
-
+<p align="center">
+  <img src="逮虾户LOGO.png" width="200" alt="逮虾户LOGO">
+</p>
 </div>
 
 ---
