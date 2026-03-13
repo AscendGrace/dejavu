@@ -18,7 +18,7 @@
 
 
 <p align="center">
-  <img src="逮虾户LOGO.png" width="200" alt="逮虾户LOGO">
+  <img src="逮虾户LOGO.png" >
 </p>
 </div>
 
