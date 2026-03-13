@@ -1,0 +1,24 @@
+# 依赖
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+
+# 构建产物
+dist/
+build/
+*.exe
+*.log
+
+# 环境配置（重要！别泄露密码）
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 系统文件
+.DS_Store
+Thumbs.db

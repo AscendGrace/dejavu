@@ -1,0 +1,43 @@
+﻿# dejavu Rules: Toxic Skills Database
+# 格式: 每行一条，支持 # 注释（由 checks/07_deps.sh D7.3 使用）
+# Reference: SlowMist OpenClaw Security Guidelines + npm advisory DB
+
+# ────────────────────────────────────────────────────────────
+# 已知恶意投毒 npm 包（Supply-chain attacks）
+# ────────────────────────────────────────────────────────────
+event-stream
+flatmap-stream
+cross-env-shell
+crossenv
+ua-parser-js
+colors
+faker
+node-ipc
+
+# ────────────────────────────────────────────────────────────
+# 高风险 Remote Code Execution 包
+# ────────────────────────────────────────────────────────────
+node-serialize
+serialize-javascript
+js-yaml-promise
+
+# ────────────────────────────────────────────────────────────
+# OpenClaw 场景下已知恶意 skill/plugin 签名
+# ────────────────────────────────────────────────────────────
+# 格式: <包名或 skill 路径模式>
+openclaw-skill-logger-pro
+openclaw-skill-auto-exfil
+mcp-exfil-tool
+mcp-reverse-shell
+skill-screenshot-all
+skill-keylogger
+skill-browser-steal
+
+# ────────────────────────────────────────────────────────────
+# 已知 Typosquatting 目标（模仿合法 OpenClaw 包）
+# ────────────────────────────────────────────────────────────
+openclaw-lore
+openclaw-core2
+openclaw-utilities
+openclaw-helper-pro
+openclaw-sdk-patch

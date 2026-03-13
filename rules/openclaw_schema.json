@@ -1,0 +1,123 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenClaw Configuration Schema",
+  "description": "dejavu v2.0 — openclaw.json 安全验证 Schema",
+  "type": "object",
+  "required": ["gateway"],
+  "properties": {
+    "gateway": {
+      "type": "object",
+      "description": "Gateway 核心配置",
+      "required": ["auth"],
+      "properties": {
+        "port": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 65535,
+          "default": 18789,
+          "description": "Gateway 监听端口"
+        },
+        "bind": {
+          "type": "string",
+          "enum": ["loopback", "127.0.0.1", "::1"],
+          "description": "安全要求: 仅绑定回环地址，不允许 0.0.0.0",
+          "errorMessage": "SECURITY: bind must be 'loopback'/'127.0.0.1' — never '0.0.0.0'"
+        },
+        "auth": {
+          "type": "object",
+          "required": ["token"],
+          "properties": {
+            "token": {
+              "type": "string",
+              "minLength": 40,
+              "pattern": "^[0-9a-fA-F]{40,}$",
+              "description": "认证令牌，要求 40+ 位十六进制字符",
+              "errorMessage": "Token must be at least 40 hex characters"
+            },
+            "mode": {
+              "type": "string",
+              "enum": ["token", "oauth2", "mtls"],
+              "description": "认证模式，禁止 none/open",
+              "errorMessage": "SECURITY: auth.mode must not be 'none' or 'open'"
+            }
+          }
+        },
+        "rateLimit": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "windowMs": { "type": "integer", "minimum": 1000 },
+            "max": { "type": "integer", "minimum": 1, "maximum": 1000 }
+          }
+        },
+        "cors": {
+          "type": "object",
+          "properties": {
+            "origins": {
+              "type": ["array", "string"],
+              "description": "禁止使用通配符 '*'",
+              "errorMessage": "SECURITY: CORS origins must not use wildcard '*'"
+            }
+          }
+        },
+        "tls": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "cert": { "type": "string" },
+            "key": { "type": "string" }
+          }
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "properties": {
+        "allowlist": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "仅允许列表中的 skill"
+        },
+        "blockList": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "明确禁止的 skill 列表"
+        },
+        "maxConcurrent": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "最大并发 skill 执行数"
+        }
+      }
+    },
+    "agents": {
+      "type": "object",
+      "properties": {
+        "denyCommands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "禁止执行的 shell 命令列表"
+        },
+        "trustedProxies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "ipv4"
+          },
+          "description": "受信代理 IP 列表，不允许 0.0.0.0/0"
+        }
+      }
+    },
+    "allowAll": {
+      "type": "boolean",
+      "enum": [false],
+      "description": "SECURITY: 必须为 false",
+      "errorMessage": "SECURITY: allowAll must not be true"
+    },
+    "devMode": {
+      "type": "boolean",
+      "description": "生产环境应设置为 false"
+    }
+  }
+}

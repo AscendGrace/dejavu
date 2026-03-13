@@ -1,0 +1,86 @@
+﻿name: OpenClaw Security Baseline Check (dejavu)
+
+on:
+  push:
+    branches: ["main", "master", "develop"]
+  pull_request:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dejavu:
+    name: dejavu Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Make dejavu executable
+        run: chmod +x dejavu/dejavu.sh dejavu/checks/*.sh
+
+      - name: Run dejavu — Full scan
+        id: dejavu
+        run: |
+          cd dejavu
+          # Bug Fix #48: GitHub Actions bash uses -eo pipefail by default.
+          # dejavu.sh exits 1/2/3 for MEDIUM/HIGH/CRITICAL findings, which would
+          # kill the step before DEJAVU_EXIT=$? is reached.
+          # Fix: disable -e around the dejavu call, then re-enable after capture.
+          set +e
+          ./dejavu.sh \
+            -d "${{ github.workspace }}" \
+            -o markdown \
+            -r "${{ github.workspace }}/dejavu-report.md" \
+            --verbose
+          DEJAVU_EXIT=$?
+          set -e
+          echo "exit_code=${DEJAVU_EXIT}" >> "$GITHUB_OUTPUT"
+          if [ "${DEJAVU_EXIT}" -ge 3 ]; then
+            echo "::error::CRITICAL security issues found! dejavu exit code: ${DEJAVU_EXIT}"
+            exit 1
+          elif [ "${DEJAVU_EXIT}" -ge 2 ]; then
+            echo "::warning::HIGH severity security issues found!"
+          fi
+
+      - name: Upload dejavu Security Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dejavu-security-report-${{ github.run_id }}
+          path: dejavu-report.md
+          retention-days: 30
+
+      - name: Comment PR with findings
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = '${{ github.workspace }}/dejavu-report.md';
+            if (!fs.existsSync(reportPath)) return;
+            const report = fs.readFileSync(reportPath, 'utf8');
+            const body = '## 🛡️ dejavu Security Scan Results\n\n' +
+                         report.split('\n').slice(0, 60).join('\n') +
+                         '\n\n_Full report available as build artifact._';
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

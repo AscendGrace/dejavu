@@ -1,0 +1,114 @@
+﻿{
+  "_comment": "dejavu DLP危险模式规则库 v2.0 — 由 checks/09_dlp.sh 使用",
+  "version": "2.0.0",
+  "patterns": [
+    {
+      "id": "DLP-001",
+      "name": "Ethereum Private Key",
+      "category": "crypto_key",
+      "severity": "CRITICAL",
+      "regex": "\\b0x[a-fA-F0-9]{64}\\b",
+      "description": "以太坊 256-bit 私钥（64位十六进制）",
+      "remediation": "立即撤销该密钥，生成新地址，检查是否已被盗用"
+    },
+    {
+      "id": "DLP-002",
+      "name": "Bitcoin WIF Private Key",
+      "category": "crypto_key",
+      "severity": "CRITICAL",
+      "regex": "\\b[5KL][1-9A-HJ-NP-Za-km-z]{50,51}\\b",
+      "description": "比特币 WIF 格式私钥",
+      "remediation": "立即将资产转移到新地址，吊销原私钥"
+    },
+    {
+      "id": "DLP-003",
+      "name": "BIP39 Mnemonic Phrase (12-word)",
+      "category": "crypto_key",
+      "severity": "CRITICAL",
+      "regex": "\\b([a-z]+ ){11}[a-z]+\\b",
+      "description": "12词助记词（BIP-39），可能是加密钱包恢复短语",
+      "remediation": "视为完全泄露，迁移所有资产到新种子词生成的钱包"
+    },
+    {
+      "id": "DLP-004",
+      "name": "BIP39 Mnemonic Phrase (24-word)",
+      "category": "crypto_key",
+      "severity": "CRITICAL",
+      "regex": "\\b([a-z]+ ){23}[a-z]+\\b",
+      "description": "24词助记词",
+      "remediation": "视为完全泄露，迁移所有资产"
+    },
+    {
+      "id": "DLP-005",
+      "name": "OpenAI API Key",
+      "category": "api_key",
+      "severity": "CRITICAL",
+      "regex": "sk-[a-zA-Z0-9]{20,}",
+      "description": "OpenAI API 密钥",
+      "remediation": "在 platform.openai.com 立即吊销该密钥"
+    },
+    {
+      "id": "DLP-006",
+      "name": "Anthropic Claude API Key",
+      "category": "api_key",
+      "severity": "CRITICAL",
+      "regex": "sk-ant-[a-zA-Z0-9\\-]{20,}",
+      "description": "Anthropic Claude API 密钥",
+      "remediation": "在 console.anthropic.com 立即吊销该密钥"
+    },
+    {
+      "id": "DLP-007",
+      "name": "Google API Key",
+      "category": "api_key",
+      "severity": "HIGH",
+      "regex": "AIza[0-9A-Za-z\\-_]{35}",
+      "description": "Google 平台 API 密钥",
+      "remediation": "在 Google Cloud Console 吊销并轮换密钥"
+    },
+    {
+      "id": "DLP-008",
+      "name": "GitHub Personal Access Token",
+      "category": "api_key",
+      "severity": "HIGH",
+      "regex": "ghp_[a-zA-Z0-9]{36}",
+      "description": "GitHub 个人访问令牌",
+      "remediation": "在 GitHub Settings > Tokens 撤销该令牌"
+    },
+    {
+      "id": "DLP-009",
+      "name": "AWS Access Key",
+      "category": "api_key",
+      "severity": "CRITICAL",
+      "regex": "AKIA[0-9A-Z]{16}",
+      "description": "AWS IAM Access Key ID",
+      "remediation": "立即在 AWS IAM 控制台停用并删除该密钥"
+    },
+    {
+      "id": "DLP-010",
+      "name": "Generic JWT Token",
+      "category": "auth_token",
+      "severity": "MEDIUM",
+      "regex": "eyJ[a-zA-Z0-9_-]{10,}\\.eyJ[a-zA-Z0-9_-]{10,}\\.[a-zA-Z0-9_-]{10,}",
+      "description": "JWT 格式令牌，可能包含认证状态",
+      "remediation": "确认该令牌是否为生产凭证，如是则撤销并重新签发"
+    },
+    {
+      "id": "DLP-011",
+      "name": "PEM Private Key",
+      "category": "crypto_key",
+      "severity": "CRITICAL",
+      "regex": "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----",
+      "description": "PEM 格式私钥文件内容",
+      "remediation": "从代码库中删除，通过密钥管理系统引用"
+    },
+    {
+      "id": "DLP-012",
+      "name": "Prompt Injection Pattern",
+      "category": "prompt_injection",
+      "severity": "HIGH",
+      "regex": "(ignore previous|disregard.*instruction|jailbreak|DAN mode|you are now|no restriction)",
+      "description": "SOUL.md 或 Skill 指令中的提示注入模式",
+      "remediation": "审查并移除所有试图绕过 AI 安全约束的指令"
+    }
+  ]
+}
