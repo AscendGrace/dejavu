@@ -16,7 +16,7 @@
 
 <p><em>针对 OpenClaw AI 网关的零依赖安全配置基线检查工具<br>Zero-dependency security baseline checker for OpenClaw AI Gateway</em></p>
 
-![逮虾户LOGO](H:\工作文档\华清未央\10-AI安全\Proclaw\dejavu-main\逮虾户LOGO.png)
+
 
 </div>
 
